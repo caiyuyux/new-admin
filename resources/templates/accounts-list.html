@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Create a new account</h2>
+<form class="form-new-account" method="POST" action="/create-account">
+    {% csrf-field %}
+    <label for="inputAccount">Account name</label>
+    <input type="text"
+           id="inputAccount"
+           placeholder="Account name"
+           name="account_name"
+           required
+           autofocus>
+    <button type="submit">Create account</button>
+</form>
+{% if accounts %}
+<h2>List of accounts for {{email}}</h2>
+<ul>
+    {% for account in accounts|sort-by:account_name %}
+    <li><a href="/{{account.account_name}}/admin">{{account.account_name}}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<h2>There is no account associated with {{email}} yet.</h2>
+{% endif %}
+<p><a href="/user-logout">Logout</a></p>
+{% endblock %}
