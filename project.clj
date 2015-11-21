@@ -27,7 +27,6 @@
                  [org.immutant/web "2.1.1" :exclusions [ch.qos.logback/logback-classic]]
                  [buddy "0.7.2"]
                  [clj-time "0.11.0"]
-                 [environ "0.5.0"]
                  [postmark "1.1.0"]]
 
   :min-lein-version "2.0.0"
@@ -38,10 +37,7 @@
   :migratus {:store :database}
 
   :plugins [[lein-environ "1.0.1"]
-            [migratus-lein "0.2.0"]
-            [environ/environ.lein "0.2.1"]]
-
-  :hooks [environ.leiningen.hooks]
+            [migratus-lein "0.2.0"]]
 
   :profiles
   {:uberjar {:omit-source true
