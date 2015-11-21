@@ -298,8 +298,7 @@
 
 
            ;generaliser la fonction de logout + mettre le lien dans le template de base avec test d'authentification
-           (GET "/test" request (str
-                                  (first (db/token_details_for_retrieve_email {:token "ApcnlfIZpAzaEJtNOZgsHam+RQmbnFbGPOaENeSUA7Q="})) ))
+           (GET "/test" request "tutu")
            (GET "/test2" request (str (valid-token? "j-OP8auCDaYq40-0-UB7pGLSZKt0IL4oUCV4hc8D9rc")))
 
            )
