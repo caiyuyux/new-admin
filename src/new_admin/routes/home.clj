@@ -14,7 +14,7 @@
             [clj-time.coerce :as c]
             [clj-time.local :as l]
             [environ.core :refer [env]]
-            [postmark.core :only (postmark)]
+            [postmark.core :only (postmark-test)]
             ))
 
 
@@ -187,7 +187,7 @@
   (-> (redirect "/")
       (assoc :session {:identity nil})))
 
-(def api-token (get (System/getenv) "POSTMARK_API_TOKEN"))
+;(def pm (postmark (get (System/getenv) "POSTMARK_API_TOKEN")))
 
 (defn create-token
   [email]
@@ -202,7 +202,7 @@
 
 (defn send-password-email
   [sender recipient token]
-  (postmark api-token sender {:to recipient
+  ((postmark-test sender) {:to recipient
                               :subject "Set your password on Clojure-app"
                               :text (str "Visit http://powerful-retreat-6840.herokuapp.com/reset-password/" token)}))
 
