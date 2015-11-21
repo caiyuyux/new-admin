@@ -13,8 +13,6 @@
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [clj-time.local :as l]
-            [environ.core :refer [env]]
-            [postmark.core :only (postmark-test)]
             ))
 
 
@@ -187,39 +185,18 @@
   (-> (redirect "/")
       (assoc :session {:identity nil})))
 
-;(def pm (postmark (get (System/getenv) "POSTMARK_API_TOKEN")))
-
-(defn create-token
-  [email]
-  (let [token (url-part 32)]
-    (do
-      (if (empty? (db/user_has_retrieve_token? {:email email}))
-        (db/create_retrieve_token! {:token token
-                                    :email email})
-        (db/update_retrieve_token! {:token token
-                                    :email email}))
-      token)))
-
-(defn send-password-email
-  [sender recipient token]
-  ((postmark-test sender) {:to recipient
-                              :subject "Set your password on Clojure-app"
-                              :text (str "Visit http://powerful-retreat-6840.herokuapp.com/reset-password/" token)}))
-
 (defn add-user
   "If the user is a new one, a random password is already created"
   [request]
   (let [params (:params request)
         identity (:identity request)
-        account_name (get-in request [:params :account_name])
-        new-user (:email params)]
+        account_name (get-in request [:params :account_name])]
     (if (admin? identity account_name)
       (do
-        (when (not (user-exists? new-user))
+        (when (not (user-exists? (:email params)))
           (save-user! (if (nil? (:password params))
                         (assoc params :password (str (crypto.random/bytes 12)))
-                        params))
-          (send-password-email identity new-user (create-token new-user)))
+                        params)))
         (db/give_access! (select-keys params [:account_name :email]))
         (redirect (str "/" (:account_name params) "/admin")))
       (layout/error-page
@@ -234,9 +211,12 @@
   (let [email (get-in request [:params :email])]
     (when (user-exists? email)
       (do
-        ;(create-token email)
+        (if (empty? (db/user_has_retrieve_token? {:email email}))
+          (db/create_retrieve_token! {:token (url-part 32)
+                                      :email email})
+          (db/update_retrieve_token! {:token (url-part 32)
+                                      :email email}))
         ;;(send email if user exists)
-        (send-password-email "tutu@toto.com" email (create-token email))
         ))
     (assoc (redirect "/retrieve-password") :flash {:sent true})))
 
@@ -319,7 +299,7 @@
 
            ;generaliser la fonction de logout + mettre le lien dans le template de base avec test d'authentification
            (GET "/test" request (str
-                                  (env :DATABASE_URL) ))
+                                  (first (db/token_details_for_retrieve_email {:token "ApcnlfIZpAzaEJtNOZgsHam+RQmbnFbGPOaENeSUA7Q="})) ))
            (GET "/test2" request (str (valid-token? "j-OP8auCDaYq40-0-UB7pGLSZKt0IL4oUCV4hc8D9rc")))
 
            )

@@ -24,7 +24,7 @@
       <file leaf-file-name="home.clj" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/new_admin/routes/home.clj">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.70448875">
+            <state vertical-scroll-proportion="5.062344">
               <caret line="203" column="26" selection-start-line="203" selection-start-column="26" selection-end-line="203" selection-end-column="26" />
               <folding />
             </state>
@@ -823,7 +823,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/new_admin/routes/home.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.70448875">
+        <state vertical-scroll-proportion="5.062344">
           <caret line="203" column="26" selection-start-line="203" selection-start-column="26" selection-end-line="203" selection-end-column="26" />
           <folding />
         </state>

@@ -26,8 +26,7 @@
                  [org.postgresql/postgresql "9.4-1203-jdbc41"]
                  [org.immutant/web "2.1.1" :exclusions [ch.qos.logback/logback-classic]]
                  [buddy "0.7.2"]
-                 [clj-time "0.11.0"]
-                 [postmark "1.1.0"]]
+                 [clj-time "0.11.0"]]
 
   :min-lein-version "2.0.0"
   :uberjar-name "new-admin.jar"
@@ -38,7 +37,6 @@
 
   :plugins [[lein-environ "1.0.1"]
             [migratus-lein "0.2.0"]]
-
   :profiles
   {:uberjar {:omit-source true
              :env {:production true}
