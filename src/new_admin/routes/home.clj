@@ -13,6 +13,8 @@
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [clj-time.local :as l]
+            [postal.core :as p]
+            [environ.core :refer [env]]
             ))
 
 
@@ -73,14 +75,12 @@
   (if-let [identity (:identity request)]
     (layout/render
     "accounts-list.html"
-    (let [user {:email identity}
-          accounts (db/accounts_for_user user)]
-      (if (not-empty accounts)
-        (merge user {:accounts accounts})
-        user)))
+    (let [user {:email identity}]
+      (merge user
+             (when-let [accounts (not-empty (db/accounts_for_user user))] {:accounts accounts})
+             (when-let [errors (get-in request [:flash :errors])] {:errors errors}))))
     (-> (redirect "/user-login")
-        (assoc :flash {:warning "Please login first"} ))
-    ))
+        (assoc :flash {:warning "Please login first"}))))
 
 
 (defn account-exists?
@@ -101,7 +101,7 @@
     {:keys [account_name]} :params
     {:keys [identity]} :session}]
   (if-let [errors (validate-account-creation params)]
-    (-> (redirect "/create-account")
+    (-> (redirect  "/accounts-list")
         (assoc :flash (assoc params :errors errors)))
     (do
       (db/create_account! {:account_name account_name})
@@ -185,39 +185,66 @@
   (-> (redirect "/")
       (assoc :session {:identity nil})))
 
+
+(defn create-token
+  [email]
+  (let [token (url-part 32)]
+    (do
+      (if (empty? (db/user_has_retrieve_token? {:email email}))
+        (db/create_retrieve_token! {:token token
+                                    :email email})
+        (db/update_retrieve_token! {:token token
+                                    :email email}))
+      token)))
+
+(def app-url
+  ;"http://powerful-retreat-6840.herokuapp.com"
+  "http://localhost:3000"
+  )
+
+(def smtp-settings {:host (env :smtp-host)
+                    :user (env :smtp-user)
+                    :pass (env :smtp-pass)
+                    :ssl :yes!!!11})
+
+
 (defn add-user
-  "If the user is a new one, a random password is already created"
+  "If the user is a new one, a random password is created and an email is sent"
   [request]
   (let [params (:params request)
         identity (:identity request)
-        account_name (get-in request [:params :account_name])]
+        account_name (get-in request [:params :account_name])
+        new-user (:email params)]
     (if (admin? identity account_name)
       (do
-        (when (not (user-exists? (:email params)))
-          (save-user! (if (nil? (:password params))
-                        (assoc params :password (str (crypto.random/bytes 12)))
-                        params)))
+        (when (not (user-exists? new-user))
+          (save-user! {:email new-user :password (str (crypto.random/bytes 12 ))})
+          (let [token (create-token new-user)]
+            (p/send-message smtp-settings
+                            {:from identity
+                             :to "laurent.test.smtp@gmail.com"
+                             :subject "Your account has been created on Clojure-app"
+                             :body (str "An account for your email " new-user " has been created by " identity ". Visit " app-url "/reset-password/" token " to set your password.")})))
         (db/give_access! (select-keys params [:account_name :email]))
         (redirect (str "/" (:account_name params) "/admin")))
       (layout/error-page
         {:status 403
          :title "Not authorized"}))))
-;; A faire: ajouter un envoi d'email
 
 ;; voir comment mutualiser les authentifications
+
+
 
 (defn retrieve-password
   [request]
   (let [email (get-in request [:params :email])]
     (when (user-exists? email)
-      (do
-        (if (empty? (db/user_has_retrieve_token? {:email email}))
-          (db/create_retrieve_token! {:token (url-part 32)
-                                      :email email})
-          (db/update_retrieve_token! {:token (url-part 32)
-                                      :email email}))
-        ;;(send email if user exists)
-        ))
+      (let [token (create-token email)]
+        (p/send-message smtp-settings
+                        {:from identity
+                         :to "laurent.test.smtp@gmail.com"
+                         :subject "Reset your password on Clojure-app"
+                         :body (str "You requested to reset your password. Visit " app-url "/reset-password/" token " to do this.")})))
     (assoc (redirect "/retrieve-password") :flash {:sent true})))
 
 (defn retrieve-password-page
@@ -274,8 +301,8 @@
          :title "Token does not exist"}))))
 
 
-;(defn mytest [handler request]
-;  (str {:pouet (macroexpand (handler request))}))
+(defn mytest [request]
+  "Email sent")
 
 
 
@@ -298,7 +325,7 @@
 
 
            ;generaliser la fonction de logout + mettre le lien dans le template de base avec test d'authentification
-           (GET "/test" request "tutu")
+           (GET "/test" request (str smtp-settings))
            (GET "/test2" request (str (valid-token? "j-OP8auCDaYq40-0-UB7pGLSZKt0IL4oUCV4hc8D9rc")))
 
            )

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ReplState" timestamp="1448185690696">{:repl-history {:ide [], :local [&quot;(str \&quot;To understand what recursion is,\&quot; \&quot; you must first understand recursion.\&quot;)\n&quot; &quot;(defn user-exists?\n  [email]\n  (:exists (first (db/exists_user? {:email email}))))&quot; &quot;(defn user-signup-page\n  [{:keys [flash]}]\n  (layout/render\n    \&quot;user-signup.html\&quot;\n    flash))&quot; &quot;(defn to-string [variable] (str variable))&quot; &quot;(read-string \&quot;(to-string)\&quot;)&quot; &quot;@to-string&quot; &quot;(@to-string)&quot; &quot;(read-string \&quot;(to string)\&quot;)&quot; &quot;()&quot;], :remote []}}</component>
+</project>

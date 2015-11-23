@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{account_name}}</h1>
+<form class="form-add-user" method="POST" action="/{{account_name}}/admin/add-user">
+    {% csrf-field %}
+    <label for="inputUser">Add a new user</label>
+    <input type="email"
+           id="inputUser"
+           placeholder="User email"
+           name="email"
+           required
+           autofocus>
+    <button type="submit">Add user</button>
+</form>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>User email</th>
+        <th>User status</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for user in users|sort-by:email %}
+    <tr>
+        <td>{{user.email}}</td>
+        <td>{% if user.admin %}Admin{% else %}User{% endif %}
+        </td>
+        <td>
+
+            <form class="form-change-admin" method="POST" action="/{{account_name}}/admin/change-admin">
+                {% csrf-field %}
+                {% if user.admin %}
+                <button type="submit"
+                        name="email"
+                        value="{{user.email}}"
+                        {% if admins_number <= 1 %}disabled{% else %}
+                {% if not admin %} disabled{% endif %}
+                {% endif %}>
+                Remove admin
+                </button>
+                {% else %}
+                <button type="submit"
+                        name="email"
+                        value="{{user.email}}"
+                {% if not admin %} disabled{% endif %}>
+                    Make admin
+                </button>
+                {% endif %}
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p><a href="/user-logout">Logout</a></p>
+{% endblock %}

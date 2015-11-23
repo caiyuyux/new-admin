@@ -26,7 +26,8 @@
                  [org.postgresql/postgresql "9.4-1203-jdbc41"]
                  [org.immutant/web "2.1.1" :exclusions [ch.qos.logback/logback-classic]]
                  [buddy "0.7.2"]
-                 [clj-time "0.11.0"]]
+                 [clj-time "0.11.0"]
+                 [com.draines/postal "1.11.3"]]
 
   :min-lein-version "2.0.0"
   :uberjar-name "new-admin.jar"
