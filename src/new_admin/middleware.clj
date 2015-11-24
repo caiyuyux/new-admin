@@ -1,5 +1,5 @@
 (ns new-admin.middleware
-  (:require [new-admin.layout :refer [*app-context* error-page]]
+  (:require [new-admin.layout :refer [*app-context* error-page *identity*]]
             [taoensso.timbre :as timbre]
             [environ.core :refer [env]]
             [ring.middleware.flash :refer [wrap-flash]]
@@ -9,8 +9,9 @@
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
             [ring.middleware.format :refer [wrap-restful-format]]
             [new-admin.config :refer [defaults]]
-            [buddy.auth.middleware :refer [wrap-authentication]]
-            [buddy.auth.backends.session :refer [session-backend]])
+            ;[buddy.auth.middleware :refer [wrap-authentication]]
+            ;[buddy.auth.backends.session :refer [session-backend]]
+            )
   (:import [javax.servlet ServletContext]))
 
 (defn wrap-context [handler]
@@ -49,16 +50,22 @@
 (defn wrap-formats [handler]
   (wrap-restful-format handler {:formats [:json-kw :transit-json :transit-msgpack]}))
 
-(defmacro indentity-in-context-map [handler]
+(defn wrap-identity
+  [handler]
   (fn [request]
-    (let [response (handler request)]
-      (assoc-in response :lol (:identity request)))))
+    (binding [*identity* (-> request :session :identity)]
+      (handler request))))
+
+;(if-let [identity (-> request :session :identity)]
+;  (handler (assoc-in request [:params :identity] identity))
+;  (handler request))
+
 
 (defn wrap-base [handler]
   (-> ((:middleware defaults) handler)
+      wrap-identity
       wrap-formats
-      (wrap-authentication (session-backend))
-      ;wrap-identity
+      ;(wrap-authentication (session-backend))
       wrap-webjars
       wrap-flash
       (wrap-session {:cookie-attrs {:http-only true}})

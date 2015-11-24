@@ -8,7 +8,6 @@
             [buddy.hashers :as hashers]
             [bouncer.core :as b]
             [bouncer.validators :as v]
-            [buddy.auth :refer [authenticated?]]
             [crypto.random :refer [url-part]]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
@@ -30,10 +29,10 @@
 ;the response will render a template with an associated context-map
 
 (defn user-signup-page
-  [{:keys [flash]}]
+  [request]
   (layout/render
     "user-signup.html"
-    flash))
+    (-> request :flash)))
 
 
 (defn user-exists?
@@ -72,7 +71,7 @@
 
 (defn accounts-list-page
   [request]
-  (if-let [identity (:identity request)]
+  (if-let [identity (-> request :session :identity)]
     (layout/render
     "accounts-list.html"
     (let [user {:email identity}]
@@ -119,7 +118,7 @@
 
 (defn admin-page
   [request]
-  (let [identity (:identity request)
+  (let [identity (-> request :session :identity)
         account_name (get-in request [:params :account_name])
         users (db/users_for_account {:account_name account_name})
         admins_number (count (filter #(true? (:admin %)) users))
@@ -140,7 +139,7 @@
 
 (defn change-admin
   [request]
-  (let [identity (:identity request)
+  (let [identity (-> request :session :identity)
         account_name (get-in request [:params :account_name])]
     (if (admin? identity account_name)
     (do (db/change_admin! (:params request))
@@ -176,7 +175,7 @@
 
 (defn home-page
   [request]
-  (if (authenticated? request)
+  (if (-> request :session :identity)
     (redirect "/accounts-list")
     (redirect "/user-signup")))
 
@@ -212,7 +211,7 @@
   "If the user is a new one, a random password is created and an email is sent"
   [request]
   (let [params (:params request)
-        identity (:identity request)
+        identity (-> request :session :identity)
         account_name (get-in request [:params :account_name])
         new-user (:email params)]
     (if (admin? identity account_name)
@@ -221,7 +220,7 @@
           (save-user! {:email new-user :password (str (crypto.random/bytes 12 ))})
           (let [token (create-token new-user)]
             (p/send-message smtp-settings
-                            {:from identity
+                            {:from "laurent.test.smtp@gmail.com"
                              :to "laurent.test.smtp@gmail.com"
                              :subject "Your account has been created on Clojure-app"
                              :body (str "An account for your email " new-user " has been created by " identity ". Visit " app-url "/reset-password/" token " to set your password.")})))
@@ -234,25 +233,24 @@
 ;; voir comment mutualiser les authentifications
 
 
-
 (defn retrieve-password
   [request]
   (let [email (get-in request [:params :email])]
     (when (user-exists? email)
       (let [token (create-token email)]
         (p/send-message smtp-settings
-                        {:from identity
+                        {:from "laurent.test.smtp@gmail.com"
                          :to "laurent.test.smtp@gmail.com"
                          :subject "Reset your password on Clojure-app"
-                         :body (str "You requested to reset your password. Visit " app-url "/reset-password/" token " to do this.")})))
+                         :body (str "You requested to reset the password for the account " email ". Visit " app-url "/reset-password/" token " to do this.")})))
     (assoc (redirect "/retrieve-password") :flash {:sent true})))
+
 
 (defn retrieve-password-page
   [{:keys [flash]}]
   (layout/render
     "retrieve-password.html"
     (select-keys flash [:sent])))
-
 
 
 (defn valid-token?
@@ -284,9 +282,6 @@
           (assoc :flash {:updated true} :session {:identity email}))))))
 
 
-
-
-
 (defn reset-password-page
   [request]
   (let [errors (get-in request [:flash :errors])
@@ -299,10 +294,6 @@
       (layout/error-page
         {:status 403
          :title "Token does not exist"}))))
-
-
-(defn mytest [request]
-  "Email sent")
 
 
 
@@ -322,10 +313,4 @@
            (POST "/retrieve-password" request (retrieve-password request))
            (GET "/reset-password/:token" request (reset-password-page request))
            (POST "/reset-password/:token" request (reset-password request))
-
-
-           ;generaliser la fonction de logout + mettre le lien dans le template de base avec test d'authentification
-           (GET "/test" request (str smtp-settings))
-           (GET "/test2" request (str (valid-token? "j-OP8auCDaYq40-0-UB7pGLSZKt0IL4oUCV4hc8D9rc")))
-
-           )
+           (GET "/test" request (str request)))

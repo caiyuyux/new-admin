@@ -7,6 +7,11 @@
 </head>
 <body>
 <div class="container">
+    {% if identity %}
+    <p>Logged in as {{identity}}. <a href="/accounts-list">All my accounts</a> <a href="/user-logout">Logout</a></p>
+    {% else %}
+    <p>Not logged in. <a href="/user-login">Login</a></p>
+    {% endif %}
     {% block content %}
     {% endblock %}
 </div>
