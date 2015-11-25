@@ -207,11 +207,6 @@
                                     :created_at (l/local-now)}))
       token)))
 
-(def app-url
-  ;"http://powerful-retreat-6840.herokuapp.com"
-  "http://localhost:3000"
-  )
-
 (def smtp-settings {:host (env :smtp-host)
                     :user (env :smtp-user)
                     :pass (env :smtp-pass)
@@ -234,7 +229,7 @@
                             {:from "laurent.test.smtp@gmail.com"
                              :to "laurent.test.smtp@gmail.com"
                              :subject "Your account has been created on Clojure-app"
-                             :body (str "An account for your email " new-user " has been created by " identity ". Visit " app-url "/reset-password/" token " to set your password.")})))
+                             :body (str "An account for your email " new-user " has been created by " identity ". Visit " (env :app-url) "/reset-password/" token " to set your password.")})))
         (db/give_access! (select-keys params [:account_name :email]))
         (redirect (str "/" (:account_name params) "/admin")))
       (layout/error-page
@@ -253,7 +248,7 @@
                         {:from "laurent.test.smtp@gmail.com"
                          :to "laurent.test.smtp@gmail.com"
                          :subject "Reset your password on Clojure-app"
-                         :body (str "You requested to reset the password for the account " email ". Visit " app-url "/reset-password/" token " to do this.")})))
+                         :body (str "You requested to reset the password for the account " email ". Visit " (env :app-url) "/reset-password/" token " to do this.")})))
     (assoc (redirect "/retrieve-password") :flash {:sent true})))
 
 

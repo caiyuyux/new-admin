@@ -1,5 +1,5 @@
 CREATE TABLE users
-(email VARCHAR(30) PRIMARY KEY,
+(email VARCHAR(50) PRIMARY KEY,
  password VARCHAR(100)
  );
 
