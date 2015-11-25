@@ -12,6 +12,7 @@
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [clj-time.local :as l]
+            [clj-time.jdbc]
             [postal.core :as p]
             [environ.core :refer [env]]))
 
@@ -266,7 +267,7 @@
 (defn valid-token?
   [token]
   (let [token-map (first (db/token_details_for_retrieve_email {:token token}))
-        timestamp (c/from-date (:created_at token-map))
+        timestamp (:created_at token-map)
         now (l/local-now)
         difference-in-minutes (t/in-minutes (t/interval timestamp now))]
     (and
@@ -325,5 +326,5 @@
            (POST "/reset-password/:token" request (reset-password request))
            (GET "/create-account" request (create-account-page request))
 
-           (GET "/test" request (db/accounts_for_user {:email "laurent@test.com"}))
+           (GET "/test" request (l/local-now))
            )

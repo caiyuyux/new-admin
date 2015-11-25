@@ -21,11 +21,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="home.clj" pinned="false" current-in-tab="false">
+      <file leaf-file-name="home.clj" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/new_admin/routes/home.clj">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.555555">
-              <caret line="203" column="34" selection-start-line="203" selection-start-column="12" selection-end-line="203" selection-end-column="34" />
+            <state vertical-scroll-proportion="0.33290324">
+              <caret line="269" column="41" selection-start-line="269" selection-start-column="41" selection-end-line="269" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -51,10 +51,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="queries.sql" pinned="false" current-in-tab="true">
+      <file leaf-file-name="queries.sql" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/resources/sql/queries.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.064516">
+            <state vertical-scroll-proportion="-11.666667">
               <caret line="80" column="9" selection-start-line="80" selection-start-column="9" selection-end-line="80" selection-end-column="31" />
               <folding />
             </state>
@@ -872,18 +872,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/new_admin/routes/home.clj">
+    <entry file="file://$PROJECT_DIR$/resources/sql/queries.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.555555">
-          <caret line="203" column="34" selection-start-line="203" selection-start-column="12" selection-end-line="203" selection-end-column="34" />
+        <state vertical-scroll-proportion="-11.666667">
+          <caret line="80" column="9" selection-start-line="80" selection-start-column="9" selection-end-line="80" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources/sql/queries.sql">
+    <entry file="file://$PROJECT_DIR$/src/new_admin/routes/home.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.064516">
-          <caret line="80" column="9" selection-start-line="80" selection-start-column="9" selection-end-line="80" selection-end-column="31" />
+        <state vertical-scroll-proportion="0.33290324">
+          <caret line="269" column="41" selection-start-line="269" selection-start-column="41" selection-end-line="269" selection-end-column="41" />
           <folding />
         </state>
       </provider>
