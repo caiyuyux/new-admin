@@ -1,34 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Register as a new user</h2>
-<form class="form-signup" method="POST" action="/user-signup">
-    {% csrf-field %}
-    <input type="email"
-           id="inputEmail"
-           placeholder="Email address"
-           name="email"
-           required
-           autofocus>
-    <br>
-    <input type="password"
-           id="inputPassword"
-           placeholder="Password"
-           name="password"
-           required>
-    <br>
-    <input type="password"
-           id="repeatPassword"
-           placeholder="Repeat password"
-           name="password-repeat"
-           required>
-    <br>
-    <button type="submit">Create user account</button>
-</form>
-{% if errors.email %}
-<p>{{errors.email|join}}</p>
-{% endif %}
-{% if errors.password %}
-<p>{{errors.password|join}}</p>
-{% endif %}
-{% endblock %}
+<div class="container">
+    <h2 class="form-email-heading">Register as a new user</h2>
+    <form class="form-email" method="POST" action="/user-signup">
+        {% csrf-field %}
+        <input type="email"
+               id="inputEmail"
+               placeholder="Email address"
+               name="email"
+               class="form-control top"
+               required
+               autofocus>
+        <input type="password"
+               id="inputPassword"
+               placeholder="Password"
+               name="password"
+               class="form-control center"
+               required>
+        <input type="password"
+               id="repeatPassword"
+               placeholder="Repeat password"
+               name="password-repeat"
+               class="form-control bottom"
+               required>
+        <button type="submit"
+                class="btn btn-lg btn-primary btn-block">
+            Create user account
+        </button>
+    </form>
+    {% if errors.email %}
+    <div class="alert alert-warning" role="alert">
+        <p>{{errors.email|join}}</p>
+    </div>
+    {% endif %}
+    {% if errors.password %}
+    <div class="alert alert-warning" role="alert">
+        <p>{{errors.password|join}}</p>
+    </div>
+    {% endif %}
+    <p>Already have an account? <a href="/user-login">Log in here</a></p>
+</div>
 
+{% endblock %}

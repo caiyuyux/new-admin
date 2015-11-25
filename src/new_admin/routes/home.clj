@@ -13,17 +13,7 @@
             [clj-time.coerce :as c]
             [clj-time.local :as l]
             [postal.core :as p]
-            [environ.core :refer [env]]
-            ))
-
-
-
-;(defn user-signup-page
-;  [request]
-;  (layout/render
-;    "user-signup.html"
-;    request))
-;;premiere version avant ajout de la gestion d'erreurs
+            [environ.core :refer [env]]))
 
 ;this is a handler, it takes a request and gives a response
 ;the response will render a template with an associated context-map
@@ -32,7 +22,8 @@
   [request]
   (layout/render
     "user-signup.html"
-    (-> request :flash)))
+    ;(-> request :flash)
+    (:flash request)))
 
 
 (defn user-exists?
@@ -82,6 +73,22 @@
         (assoc :flash {:warning "Please login first"}))))
 
 
+(defn create-account-page
+  [request]
+  (if-let [identity (-> request :session :identity)]
+    (layout/render
+      "create-account.html"
+      (let [user {:email identity}]
+        (merge user
+               ;(when-let [accounts (not-empty (db/accounts_for_user user))] {:accounts accounts})
+               (when-let [errors (get-in request [:flash :errors])] {:errors errors}))))
+    (-> (redirect "/user-login")
+        (assoc :flash {:warning "Please login first"}))))
+
+
+
+
+
 (defn account-exists?
   [account_name]
   (:exists (first (db/exists_account? {:account_name account_name}))))
@@ -91,7 +98,7 @@
     (b/validate params
                 :account_name [v/required
                                [#(not (account-exists? %)) :message "Account name already exists"]
-                               [v/min-count 6]
+                               [v/min-count 6 :message "Account name must be more than 6 characters"]
                                [v/matches #"^[a-z][\d,a-z,-]+[\d,a-z]$" :message "Account name must be lowercase letters and - only, and start and end with a letter"]])))
 
 
@@ -100,7 +107,7 @@
     {:keys [account_name]} :params
     {:keys [identity]} :session}]
   (if-let [errors (validate-account-creation params)]
-    (-> (redirect  "/accounts-list")
+    (-> (redirect  "/create-account")
         (assoc :flash (assoc params :errors errors)))
     (do
       (db/create_account! {:account_name account_name})
@@ -177,7 +184,8 @@
   [request]
   (if (-> request :session :identity)
     (redirect "/accounts-list")
-    (redirect "/user-signup")))
+    (layout/render
+    "home.html")))
 
 (defn user-logout
   [request]
@@ -313,4 +321,7 @@
            (POST "/retrieve-password" request (retrieve-password request))
            (GET "/reset-password/:token" request (reset-password-page request))
            (POST "/reset-password/:token" request (reset-password request))
-           (GET "/test" request (str request)))
+           (GET "/create-account" request (create-account-page request))
+
+           (GET "/test" request (db/accounts_for_user {:email "laurent@test.com"}))
+           )

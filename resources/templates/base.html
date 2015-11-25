@@ -3,17 +3,91 @@
 <head>
     <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <META name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin-app</title>
+    <title>Welcome to Admin App</title>
 </head>
 <body>
+<!-- navbar -->
+<div id="navbar">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle"
+                        data-target="#app-navbar"
+                        data-toggle="collapse"
+                        aria-expanded="false"
+                        aria-controls="navbar">
+                    <span class="sr-only">Toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="{{servlet-context}}/" class="navbar-brand">Admin App</a>
+            </div>
+            <div id="app-navbar" class="navbar-collapse collapse">
+                {% if identity %}
+                <ul class="nav navbar-nav">
+                    <li {% ifequal page "accounts-list.html" %} class="active"{%endifequal%}>
+                    <a href="{{servlet-context}}/accounts-list">My accounts</a>
+                    </li>
+                    <li {% ifequal page "create-account.html" %} class="active"{%endifequal%}>
+                    <a href="{{servlet-context}}/create-account">Create a new account</a>
+                    </li>
+                </ul>
+                {% endif %}
+
+
+                {% if page|no-login-in-navbar? %}
+                <p class="navbar-text navbar-right">
+                    {% if identity %}
+                    Signed in as {{identity}}. <a href="/user-logout">Logout</a>
+                    {% else %}
+                    <a href="/user-login">Login</a> or <a href="/user-signup">Create account</a>
+                    {% endif %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</div>
+
 <div class="container">
-    {% if identity %}
-    <p>Logged in as {{identity}}. <a href="/accounts-list">All my accounts</a> <a href="/user-logout">Logout</a></p>
-    {% else %}
-    <p>Not logged in. <a href="/user-login">Login</a></p>
-    {% endif %}
     {% block content %}
     {% endblock %}
 </div>
+<!-- scripts and styles -->
+{% style "/assets/bootstrap/css/bootstrap.min.css" %}
+{% style "/assets/bootstrap/css/bootstrap-theme.min.css" %}
+{% style "/css/screen.css" %}
+
+{% script "/assets/jquery/jquery.min.js" %}
+{% script "/assets/bootstrap/js/bootstrap.min.js" %}
+{% script "/assets/bootstrap/js/collapse.js" %}
+
+<script type="text/javascript">
+      var context = "{{servlet-context}}";
+    </script>
+{% block page-scripts %}
+{% endblock %}
 </body>
 </html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+    <!--<META http-equiv="Content-Type" content="text/html; charset=UTF-8">-->
+    <!--<META name="viewport" content="width=device-width, initial-scale=1">-->
+    <!--<title>Admin-app</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+    <!--{% if identity %}-->
+    <!--<p>Logged in as {{identity}}. <a href="/accounts-list">All my accounts</a> <a href="/user-logout">Logout</a></p>-->
+    <!--{% else %}-->
+    <!--<p>Not logged in. <a href="/user-login">Login</a></p>-->
+    <!--{% endif %}-->
+    <!--{% block content %}-->
+    <!--{% endblock %}-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
