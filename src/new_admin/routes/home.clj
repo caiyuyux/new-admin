@@ -199,9 +199,11 @@
     (do
       (if (empty? (db/user_has_retrieve_token? {:email email}))
         (db/create_retrieve_token! {:token token
-                                    :email email})
+                                    :email email
+                                    :created_at (l/local-now)})
         (db/update_retrieve_token! {:token token
-                                    :email email}))
+                                    :email email
+                                    :created_at (l/local-now)}))
       token)))
 
 (def app-url

@@ -67,8 +67,8 @@ WHERE email = :email AND account_name = :account_name;
 
 -- name: create_retrieve_token!
 -- self-explanatory - did not manage to create a nice ON CONFLICT condition - to be done
-INSERT INTO retrieve_email_tokens (email, token)
-VALUES (:email, :token);
+INSERT INTO retrieve_email_tokens (email, token, created_at)
+VALUES (:email, :token, :created_at);
 
 
 -- name: user_has_retrieve_token?
@@ -81,7 +81,7 @@ WHERE email = :email;
 -- name: update_retrieve_token!
 -- self-explanatory
 UPDATE retrieve_email_tokens
-SET token = :token, created_at = CURRENT_TIMESTAMP
+SET token = :token, created_at = :created_at
 WHERE email = :email;
 
 
